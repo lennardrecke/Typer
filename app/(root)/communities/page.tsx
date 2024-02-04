@@ -1,12 +1,20 @@
 import CommunityCard from '@/components/cards/CommunityCard';
 import UserCard from '@/components/cards/UserCard';
+import CreateCommunity from '@/components/forms/CreateCommunity';
+import Pagination from '@/components/shared/Pagination';
+import Searchbar from '@/components/shared/Searchbar';
+import { Button } from '@/components/ui/button';
 import { fetchCommunities } from '@/lib/actions/community.actions';
 import { fetchUser, fetchUsers } from '@/lib/actions/user.actions';
 import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 import React from 'react';
 
-const Page = async () => {
+const Page = async ({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) => {
   const user = await currentUser();
 
   if (!user) return null;
@@ -25,9 +33,11 @@ const Page = async () => {
     <>
       <h1 className='head-text mb-10'>Communities</h1>
 
-      {/* <div className='mt-5'>
+      <div className='mt-5 flex flex-row justify-between items-center gap-5'>
         <Searchbar routeType='communities' />
-      </div>*/}
+        <CreateCommunity userId={user.id} />
+      </div>
+
       <section className='mt-9 flex fle-wrap gap-4'>
         {result.communities.length === 0 ? (
           <p className='no-results'>No Results</p>
@@ -47,6 +57,12 @@ const Page = async () => {
           </>
         )}
       </section>
+
+      <Pagination
+        path='communities'
+        pageNumber={searchParams?.page ? +searchParams.page : 1}
+        isNext={result.isNext}
+      />
     </>
   );
 };

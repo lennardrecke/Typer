@@ -1,11 +1,15 @@
 import TypoCard from '@/components/cards/TypoCard';
+import Pagination from '@/components/shared/Pagination';
 import { fetchTypos } from '@/lib/actions/typo.actions';
 import { fetchUser } from '@/lib/actions/user.actions';
 import { currentUser } from '@clerk/nextjs';
 import { redirect } from 'next/navigation';
 
-export default async function Home() {
-  const result = await fetchTypos(1, 30);
+export default async function Home({
+  searchParams,
+}: {
+  searchParams: { [key: string]: string | undefined };
+}) {
   const user = await currentUser();
 
   if (!user) return null;
@@ -13,6 +17,11 @@ export default async function Home() {
   const userInfo = await fetchUser(user.id);
 
   if (!userInfo?.onboarded) redirect('/onboarding');
+
+  const result = await fetchTypos(
+    searchParams.page ? +searchParams.page : 1,
+    30
+  );
 
   return (
     <>
@@ -34,12 +43,17 @@ export default async function Home() {
                 community={typo.community}
                 createdAt={typo.createdAt}
                 comments={typo.children}
-                sameUser={typo.author.id === user.id}
               />
             ))}
           </>
         )}
       </section>
+
+      <Pagination
+        path='/'
+        pageNumber={searchParams?.page ? +searchParams.page : 1}
+        isNext={result.isNext}
+      />
     </>
   );
 }

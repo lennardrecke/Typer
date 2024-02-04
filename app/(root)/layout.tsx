@@ -24,9 +24,9 @@ export default function RootLayout({
 }>) {
   return (
     <ClerkProvider>
-      <html lang='en'>
+      <html lang='en' suppressHydrationWarning>
         <body className={inter.className}>
-          <ThemeProvider attribute='class' defaultTheme='dark'>
+          <ThemeProvider attribute='class' defaultTheme='dark' enableSystem>
             <TopBar />
             <main className='flex flex-row'>
               <LeftSideBar />

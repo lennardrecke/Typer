@@ -29,6 +29,11 @@ export const sidebarLinks = [
     route: '/profile',
     label: 'Profile',
   },
+  {
+    imgURL: '/assets/jobs.svg',
+    route: '/jobs',
+    label: 'Jobs',
+  },
 ];
 
 export const profileTabs = [

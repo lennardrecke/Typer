@@ -10,7 +10,7 @@ interface Props {
   imgUrl: string;
   bio: string;
   pronouns: string;
-  type?: 'User' | 'Community';
+  type?: 'Profile' | 'Community';
 }
 
 const ProfileHeader = ({
@@ -21,7 +21,7 @@ const ProfileHeader = ({
   imgUrl,
   bio,
   pronouns,
-  type,
+  type = 'Profile',
 }: Props) => {
   return (
     <div className='flex w-full flex-col justify-start'>
@@ -43,7 +43,7 @@ const ProfileHeader = ({
             <p className='text-base-medium text-gray-1'>@{username}</p>
           </div>
         </div>
-        <Share typoId={accountId} shareType='profile' />
+        <Share typoId={accountId} shareType={type} />
       </div>
       {/* TODO: Community */}
 

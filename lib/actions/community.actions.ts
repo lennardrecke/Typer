@@ -7,9 +7,14 @@ import Typo from '../models/typo.model';
 import User from '../models/user.model';
 
 import { connectToDatabase } from '../mongoose';
+import { nanoid } from 'nanoid';
+
+function generateCommunityId() {
+  // 'com_' prefix followed by a 24-character random string
+  return `com_${nanoid(24)}`;
+}
 
 export async function createCommunity(
-  id: string,
   name: string,
   username: string,
   image: string,
@@ -26,7 +31,7 @@ export async function createCommunity(
     }
 
     const newCommunity = new Community({
-      id,
+      id: generateCommunityId(),
       name,
       username,
       image,

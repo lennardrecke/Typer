@@ -29,6 +29,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
         imgUrl={userInfo.image}
         bio={userInfo.bio}
         pronouns={userInfo.pronouns}
+        type='Profile'
       />
 
       <div className='mt-9'>
