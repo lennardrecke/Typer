@@ -112,13 +112,15 @@ const TypoCard = ({
           </div>
         </div>
 
-        <More
-          typoId={id}
-          currentUserId={currentUserId}
-          authorId={author.id}
-          parentId={parentId}
-          isComment={isComment}
-        />
+        {sameUser && (
+          <More
+            typoId={id}
+            currentUserId={currentUserId}
+            authorId={author.id}
+            parentId={parentId}
+            isComment={isComment}
+          />
+        )}
       </div>
 
       {!isComment && comments.length > 0 && (

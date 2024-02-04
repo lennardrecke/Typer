@@ -38,7 +38,6 @@ const More = ({
   parentId,
   isComment,
 }: Props) => {
-  if (currentUserId !== authorId) return null;
   const pathname = usePathname();
   const router = useRouter();
 
