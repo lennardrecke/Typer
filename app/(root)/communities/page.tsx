@@ -38,7 +38,7 @@ const Page = async ({
         <CreateCommunity userId={user.id} />
       </div>
 
-      <section className='mt-9 flex fle-wrap gap-4'>
+      <section className='mt-9 flex flex-wrap gap-4'>
         {result.communities.length === 0 ? (
           <p className='no-results'>No Results</p>
         ) : (
