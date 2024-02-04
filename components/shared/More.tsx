@@ -9,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import DeleteTypo from '../forms/DeleteTypo';
 import { Button } from '../ui/button';
 import { MoreVertical } from 'lucide-react';
 import {
