@@ -9,6 +9,7 @@ interface Props {
   imgUrl: string;
   bio: string;
   pronouns: string;
+  type?: 'User' | 'Community';
 }
 
 const ProfileHeader = ({
@@ -19,6 +20,7 @@ const ProfileHeader = ({
   imgUrl,
   bio,
   pronouns,
+  type,
 }: Props) => {
   return (
     <div className='flex w-full flex-col justify-start'>

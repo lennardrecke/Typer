@@ -1,3 +1,4 @@
+import { formatDateString } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
@@ -115,7 +116,26 @@ const TypoCard = ({
             </div>
           </div>
         </div>
+
+        {/*Delete typo */}
+        {/*Show comment logos */}
       </div>
+      {!isComment && community && (
+        <Link
+          href={`/communities/${community.id}`}
+          className='mt-5 flex items-center'>
+          <p className='text-subtle-medium text-gray-1 flex flex-row hover:underline'>
+            {formatDateString(createdAt)} - {community.name} Community
+            <Image
+              src={community.image}
+              alt='Community image'
+              width={14}
+              height={14}
+              className='rounded-full ml-1 object-cover'
+            />
+          </p>
+        </Link>
+      )}
     </article>
   );
 };

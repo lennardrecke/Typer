@@ -18,8 +18,7 @@ import { Textarea } from '../ui/textarea';
 import { usePathname, useRouter } from 'next/navigation';
 import { TypoValidation } from '@/lib/validations/typo';
 import { createTypo } from '@/lib/actions/typo.actions';
-
-//import { updateTypo } from '@/lib/actions/typo.actions';
+import { useOrganization } from '@clerk/nextjs';
 
 interface Props {
   user: {
@@ -37,6 +36,7 @@ interface Props {
 function PostTypo({ userId }: { userId: string }) {
   const router = useRouter();
   const pathname = usePathname();
+  const { organization } = useOrganization();
 
   const form = useForm({
     resolver: zodResolver(TypoValidation),
@@ -50,7 +50,7 @@ function PostTypo({ userId }: { userId: string }) {
     await createTypo({
       text: values.typo,
       author: userId,
-      communityId: null,
+      communityId: organization ? organization.id : null,
       path: pathname,
     });
 

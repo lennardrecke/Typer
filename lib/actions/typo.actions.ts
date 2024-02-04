@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import Typo from '../models/typo.model';
 import User from '../models/user.model';
 import { connectToDatabase } from '../mongoose';
+import Community from '../models/community.model';
 
 interface Params {
   text: string;
@@ -16,16 +17,27 @@ export async function createTypo({ text, author, communityId, path }: Params) {
   try {
     connectToDatabase();
 
+    const communityIdObject = await Community.findOne(
+      { id: communityId },
+      { _id: 1 }
+    );
+
     const createdTypo = await Typo.create({
       text,
       author,
-      community: null,
+      community: communityIdObject,
     });
 
     // Update user model
     await User.findByIdAndUpdate(author, {
       $push: { typos: createdTypo._id },
     });
+
+    if (communityIdObject) {
+      await Community.findByIdAndUpdate(communityIdObject, {
+        $push: { typos: createdTypo._id },
+      });
+    }
 
     revalidatePath(path);
   } catch (error: any) {
@@ -45,6 +57,7 @@ export async function fetchTypos(pageNumber = 1, pageSize = 20) {
     .skip(skipAmount)
     .limit(pageSize)
     .populate({ path: 'author', model: User })
+    .populate({ path: 'community', model: Community })
     .populate({
       path: 'children',
       populate: {
@@ -65,6 +78,68 @@ export async function fetchTypos(pageNumber = 1, pageSize = 20) {
   return { typos, isNext };
 }
 
+async function fetchAllChildTypos(typoId: string): Promise<any[]> {
+  const childTypos = await Typo.find({ parentId: typoId });
+
+  const descendantTypos = [];
+
+  for (const childTypo of childTypos) {
+    const descendants = await fetchAllChildTypos(childTypo._id);
+    descendantTypos.push(childTypo, ...descendants);
+  }
+
+  return descendantTypos;
+}
+
+export async function deleteTypo(typoId: string, path: string): Promise<void> {
+  try {
+    connectToDatabase();
+
+    const mainTypo = await Typo.findById(typoId).populate('author community');
+
+    if (!mainTypo) {
+      throw new Error('Typo not found');
+    }
+
+    const descendantTypos = await fetchAllChildTypos(typoId);
+
+    const descendantTypoIds = [
+      typoId,
+      ...descendantTypos.map((typo) => typo._id),
+    ];
+
+    const uniqueAuthorIds = new Set(
+      [
+        ...descendantTypos.map((typo) => typo.author?._id?.toString()),
+        mainTypo.author?._id?.toString(),
+      ].filter((typoId) => typoId !== null)
+    );
+
+    const uniqueCommunityIds = new Set(
+      [
+        ...descendantTypos.map((typo) => typo.community?._id?.toString()),
+        mainTypo.community?._id?.toString(),
+      ].filter((typoId) => typoId !== null)
+    );
+
+    await Typo.deleteMany({ _id: { $in: descendantTypoIds } });
+
+    await User.updateMany(
+      { _id: { $in: Array.from(uniqueAuthorIds) } },
+      { $pull: { typos: { $in: descendantTypoIds } } }
+    );
+
+    await Community.updateMany(
+      { _id: { $in: Array.from(uniqueCommunityIds) } },
+      { $pull: { typos: { $in: descendantTypoIds } } }
+    );
+
+    revalidatePath(path);
+  } catch (error: any) {
+    throw new Error(`Error deleting typo: ${error.message}`);
+  }
+}
+
 export async function fetchTypoById(id: string) {
   connectToDatabase();
 
@@ -75,6 +150,11 @@ export async function fetchTypoById(id: string) {
         path: 'author',
         model: User,
         select: '_id id name username image',
+      })
+      .populate({
+        path: 'community',
+        model: Community,
+        select: '_id id name image',
       })
       .populate({
         path: 'children',

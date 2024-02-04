@@ -3,9 +3,9 @@
 import { revalidatePath } from 'next/cache';
 import User from '../models/user.model';
 import { connectToDatabase } from '../mongoose';
-import { connect } from 'http2';
 import Typo from '../models/typo.model';
 import { FilterQuery, SortOrder } from 'mongoose';
+import Community from '../models/community.model';
 
 interface Params {
   userId: string;
@@ -70,15 +70,22 @@ export async function fetchUserTypos(userId: string) {
     return await User.findOne({ id: userId }).populate({
       path: 'typos',
       model: Typo,
-      populate: {
-        path: 'children',
-        model: Typo,
-        populate: {
-          path: 'author',
-          model: User,
-          select: 'name image id',
+      populate: [
+        {
+          path: 'community',
+          model: Community,
+          select: 'name image id _id',
         },
-      },
+        {
+          path: 'children',
+          model: Typo,
+          populate: {
+            path: 'author',
+            model: User,
+            select: 'name image id',
+          },
+        },
+      ],
     });
   } catch (error: any) {
     throw new Error(`Failed to fetch user: ${error.message}`);

@@ -1,5 +1,4 @@
 import mongoose from 'mongoose';
-import { string } from 'zod';
 
 const typoSchema = new mongoose.Schema({
   text: {
@@ -11,7 +10,7 @@ const typoSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
   },
-  communityId: {
+  community: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Community',
   },
