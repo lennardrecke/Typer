@@ -2,6 +2,8 @@ import { formatDateString } from '@/lib/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react';
+import Share from '../shared/Share';
+import More from '../shared/More';
 
 interface Props {
   id: string;
@@ -26,7 +28,6 @@ interface Props {
     };
   }[];
   isComment?: boolean;
-  sameUser?: boolean;
 }
 
 const TypoCard = ({
@@ -39,8 +40,8 @@ const TypoCard = ({
   createdAt,
   comments,
   isComment,
-  sameUser,
 }: Props) => {
+  const sameUser = currentUserId === author.id;
   return (
     <article
       className={`flex w-full flex-col rounded-xl ${
@@ -61,10 +62,10 @@ const TypoCard = ({
             <div className='typo-card_bar' />
           </div>
           <div className='flex w-full flex-col'>
-            <Link href={`/profile/${author.id}`} className='w-fit'>
-              <h4 className='cursor-pointer text-base-semibold text-light-1'>
+            <Link href={`/profile/${author.id}`} className='w-fit group'>
+              <h4 className='cursor-pointer text-base-semibold text-light-1 group-hover:underline'>
                 {author.name}
-                <span className='text-subtle-medium text-gray-1 ml-2'>
+                <span className='text-subtle-medium text-gray-1 ml-2 group-hover:underline decoration-gray-1'>
                   {sameUser ? '@You' : `@${author.username}`}
                 </span>
               </h4>
@@ -79,7 +80,7 @@ const TypoCard = ({
                   alt='Like'
                   width={24}
                   height={24}
-                  className='cursor-pointer object-contain'
+                  className='cursor-pointer object-contain hover:text-red-500'
                 />
                 <Link href={`/typo/${id}`}>
                   <Image
@@ -97,13 +98,7 @@ const TypoCard = ({
                   height={24}
                   className='cursor-pointer object-contain'
                 />
-                <Image
-                  src='/assets/share.svg'
-                  alt='Share'
-                  width={24}
-                  height={24}
-                  className='cursor-pointer object-contain'
-                />
+                <Share typoId={id} shareType='typo' />
               </div>
 
               {isComment && comments.length > 0 && (
@@ -117,9 +112,35 @@ const TypoCard = ({
           </div>
         </div>
 
-        {/*Delete typo */}
-        {/*Show comment logos */}
+        <More
+          typoId={id}
+          currentUserId={currentUserId}
+          authorId={author.id}
+          parentId={parentId}
+          isComment={isComment}
+        />
       </div>
+
+      {!isComment && comments.length > 0 && (
+        <div className='ml-1 mt-3 flex items-center gap-2'>
+          {comments.slice(0, 2).map((comment, index) => (
+            <Image
+              key={index}
+              src={comment.author.image}
+              alt={`user_${index}`}
+              width={24}
+              height={24}
+              className={`${index !== 0 && '-ml-5'} rounded-full object-cover`}
+            />
+          ))}
+          <Link href={`/typo/${id}`}>
+            <p className='mt-1 text-subtle-medium text-gray-1'>
+              {comments.length} repl{comments.length > 1 ? 'ies' : 'y'}
+            </p>
+          </Link>
+        </div>
+      )}
+
       {!isComment && community && (
         <Link
           href={`/communities/${community.id}`}

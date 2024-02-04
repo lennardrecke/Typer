@@ -16,8 +16,7 @@ const Page = async ({ params }: { params: { id: string } }) => {
   if (!userInfo?.onboarded) redirect('/onboarding');
 
   const typo = await fetchTypoById(params.id);
-
-  const sameUser = typo.author.id === user.id;
+  if (!typo) redirect('/');
 
   return (
     <section className='relative'>
@@ -32,7 +31,6 @@ const Page = async ({ params }: { params: { id: string } }) => {
           community={typo.community}
           createdAt={typo.createdAt}
           comments={typo.children}
-          sameUser={sameUser}
         />
       </div>
       <div className='mt-7'>
@@ -56,7 +54,6 @@ const Page = async ({ params }: { params: { id: string } }) => {
             createdAt={comment.createdAt}
             comments={comment.children}
             isComment
-            sameUser={sameUser}
           />
         ))}
       </div>

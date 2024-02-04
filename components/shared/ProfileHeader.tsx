@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
+import Share from './Share';
 
 interface Props {
   accountId: string;
@@ -42,6 +43,7 @@ const ProfileHeader = ({
             <p className='text-base-medium text-gray-1'>@{username}</p>
           </div>
         </div>
+        <Share typoId={accountId} shareType='profile' />
       </div>
       {/* TODO: Community */}
 

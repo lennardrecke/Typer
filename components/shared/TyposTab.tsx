@@ -83,7 +83,6 @@ const TyposTab = async ({ currentUserId, accountId, accountType }: Props) => {
           }
           createdAt={typo.createdAt}
           comments={typo.children}
-          sameUser={sameUser}
         />
       ))}
     </section>
